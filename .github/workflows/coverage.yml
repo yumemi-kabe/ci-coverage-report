@@ -1,0 +1,45 @@
+name: 'coverage'
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+
+jobs:
+  coverage:
+    strategy:
+      matrix:
+        path:
+#          - ./typescript/apps/services/ticket-reading-api
+#          - ./typescript/apps/services/management-api
+          - ./.github
+    defaults:
+      run:
+        working-directory: typescript/apps/services/ticket-reading-api
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Run unit test
+        run: docker compose exec app yarn test:cov-ci-json
+#      - name: install packages
+#        working-directory: ./typescript/apps/services/ticket-reading-api
+#        run: yarn install
+#      - name: generate from prisma schema
+#        working-directory: ./typescript/apps/services/ticket-reading-api
+#        run: |
+#          make reset-prisma
+#          yarn prisma generate
+#      - name: Setup tmate session
+#        uses: mxschmitt/action-tmate@v3
+      - name: report coverage
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          package-manager: yarn
+#          test-script: yarn test
+          working-directory: ./
+          coverage-file: report.json
+          skip-step: all
